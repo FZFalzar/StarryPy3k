@@ -38,24 +38,24 @@ class ServerAds(SimpleCommandPlugin):
     def ads_interval(self, data, protocol):
         """Sets interval for display of serverads. Syntax: /ads_interval [duration in seconds]"""
         if len(data) == 0:
-            asyncio.Task(protocol.send_message(self.ads_interval.__doc__))
-            asyncio.Task(protocol.send_message("Current interval: %s seconds" % self.interval))
+            yield from protocol.send_message(self.ads_interval.__doc__)
+            yield from protocol.send_message("Current interval: %s seconds" % self.interval)
             return
         num = data[0]
         try:
             self.interval = int(num)
-            asyncio.Task(self.save_config())
-            asyncio.Task(protocol.send_message("Interval set -> %s seconds" % self.interval))
+            yield from self.save_config()
+            yield from protocol.send_message("Interval set -> %s seconds" % self.interval)
         except:
-            asyncio.Task(protocol.send_message("Invalid input! %s" % num))
-            asyncio.Task(protocol.send_message(self.ads_interval.__doc__))
+            yield from protocol.send_message("Invalid input! %s" % num)
+            yield from protocol.send_message(self.ads_interval.__doc__)
             return
 
     @command("ads_reload", role=Owner, doc="Reloads configuration values")
     def ads_reload(self, data, protocol):
         """Reloads configuration values. Syntax: /ads_reload"""
-        asyncio.Task(self.load_config())
-        asyncio.Task(protocol.send_message("ServerAds reloaded!"))
+        yield from self.load_config()
+        yield from protocol.send_message("ServerAds reloaded!")
 
 
 #=======================================================================================================================
