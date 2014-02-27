@@ -12,13 +12,11 @@ __author__ = "FZFalzar"
 
 class AFKCommand(SimpleCommandPlugin):
     name = "AFKCommand"
-    commands = ["afk"]
     auto_activate = True
     afk_list = dict()
 
     def activate(self):
         super().activate()
-        #self.player_manager = self.plugins["player_manager"].player_manager
         asyncio.Task(self.load_config())
 
     @asyncio.coroutine
@@ -37,11 +35,11 @@ class AFKCommand(SimpleCommandPlugin):
         """ Marks a user as AFK (Away From Keyboard) Syntax: /afk"""
         if protocol.player.name in self.afk_list:
             if self.afk_list[protocol.player.name] == True:
-                asyncio.Task(self.unset_afk_status(protocol.player.name))
+                yield from self.unset_afk_status(protocol.player.name)
             else:
-                asyncio.Task(self.set_afk_status(protocol.player.name))
+                yield from self.set_afk_status(protocol.player.name)
         else:
-            asyncio.Task(self.set_afk_status(protocol.player.name))
+            yield from self.set_afk_status(protocol.player.name)
 
     @asyncio.coroutine
     def set_afk_status(self, name):
@@ -50,7 +48,6 @@ class AFKCommand(SimpleCommandPlugin):
                 #self.factory.broadcast("%s %s" % (self.player_manager.get_by_name(name).colored_name(self.config.colors), self.afk_message))
                 yield from self.factory.broadcast("%s %s" % (name, self.afk_message))
                 self.afk_list[name] = True
-                #return True
         else:
             self.afk_list[name] = True
             yield from self.factory.broadcast("%s %s" % (name, self.afk_message))
@@ -63,7 +60,6 @@ class AFKCommand(SimpleCommandPlugin):
                 #self.factory.broadcast("%s %s" % (self.player_manager.get_by_name(name).colored_name(self.config.colors), self.afkreturn_message))
                 yield from self.factory.broadcast("%s %s" % (name, self.afkreturn_message))
                 self.afk_list[name] = False
-                #return True
         else:
             self.afk_list[name] = False
             yield from self.factory.broadcast("%s %s" % (name, self.afkreturn_message))
