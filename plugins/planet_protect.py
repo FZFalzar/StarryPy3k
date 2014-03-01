@@ -1,8 +1,8 @@
 import asyncio
 
-from base_plugin import SimpleCommandPlugin, command
+from base_plugin import SimpleCommandPlugin
 from plugins.player_manager import Admin, Ship
-from utilities import Direction
+from utilities import Direction, command
 
 
 class Protect(Admin):
@@ -61,11 +61,11 @@ class PlanetProtect(SimpleCommandPlugin):
             protocol.player.location.allowed_builders.add(p.name)
             yield from protocol.send_message(
                 "Added %s to allowed list for %s" % (
-                p.name, protocol.player.location))
+                    p.name, protocol.player.location))
             try:
                 yield from p.protocol.send_message(
                     "You've been granted build access on %s by %s" % (
-                    protocol.player.location, protocol.player.name))
+                        protocol.player.location, protocol.player.name))
             except AttributeError:
                 yield from protocol.send_message(
                     "%s isn't online, so we can't send them a notification."
@@ -116,14 +116,14 @@ class PlanetProtect(SimpleCommandPlugin):
             if not getattr(protocol.player.location, "protected", False):
                 return True
             else:
-                if Admin.__name__ in protocol.player.roles:
+                if protocol.player.check_role(Admin):
                     return True
                 elif protocol.player.name in protocol.player.location.allowed_builders:
                     return True
                 else:
                     return False
         except AttributeError as e:
-            print(e)
+            self.logger.exception("Attribute error.", exc_info=True)
             return True
 
     def on_entity_create(self, data, protocol):

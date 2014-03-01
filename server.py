@@ -23,6 +23,10 @@ class StarryPyServer:
         self.state = None
         self._alive = True
         self.client_ip = reader._transport.get_extra_info('peername')[0]
+        self._server_read_future = None
+        self._client_read_future = None
+        self._server_write_future = None
+        self._client_write_future = None
         logger.info("Received connection from %s", self.client_ip)
 
     @asyncio.coroutine
@@ -93,9 +97,13 @@ class StarryPyServer:
         yield from self._writer.drain()
 
     @asyncio.coroutine
+    def client_raw_write(self, data):
+        self._client_writer.write(data)
+        yield from self._client_writer.drain()
+
+    @asyncio.coroutine
     def write_client(self, packet):
-        self._client_writer.write(packet['original_data'])
-        yield from self._writer.drain()
+        yield from self.client_raw_write(packet['original_data'])
 
     def die(self):
         if self._alive:
@@ -164,6 +172,10 @@ class ServerFactory:
         server = StarryPyServer(reader, writer, factory=self)
         self.protocols.append(server)
 
+    def kill_all(self):
+        for protocol in self.protocols:
+            protocol.die()
+
 
 @asyncio.coroutine
 def start_server():
@@ -211,5 +223,8 @@ if __name__ == "__main__":
     except (KeyboardInterrupt, SystemExit):
         logger.warning("Exiting")
     finally:
+        server_factory.result().kill_all()
         server_factory.result().plugin_manager.deactivate_all()
+        loop.stop()
+        loop.close()
         logger.warning("Running commit %s", ver)
