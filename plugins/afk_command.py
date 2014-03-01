@@ -5,7 +5,8 @@
 #   Description: Simple AFK command with configurable messages
 #===========================================================
 import asyncio
-from base_plugin import SimpleCommandPlugin, command
+from base_plugin import SimpleCommandPlugin
+from utilities import Command
 from plugins.player_manager import Guest
 
 __author__ = "FZFalzar"
@@ -17,20 +18,20 @@ class AFKCommand(SimpleCommandPlugin):
 
     def activate(self):
         super().activate()
-        asyncio.Task(self.load_config())
+        self.load_config()
 
-    @asyncio.coroutine
     def load_config(self):
         try:
             self.afk_message = self.config.config.afk["afk_msg"]
             self.afkreturn_message = self.config.config.afk["afkreturn_msg"]
+            self.logger.info("Configuration loaded")
             print("[%s] Configuration loaded successfully" % self.name)
         except Exception as e:
-            print("[%s] Error occured! %s" % (self.name, "Failed to load config values!"))
+            self.logger.info("Configuration failed to load! Error: %s" % e)
             self.afk_message = "^gray;is now AFK."
             self.afkreturn_message = "^gray;has returned."
 
-    @command("afk", role=Guest, doc="Marks/unmarks your status as Away From Keyboard (AFK)")
+    @Command("afk", role=Guest, doc="Marks/unmarks your status as Away From Keyboard (AFK)")
     def afk(self, data, protocol):
         """ Marks a user as AFK (Away From Keyboard) Syntax: /afk"""
         if protocol.player.name in self.afk_list:
