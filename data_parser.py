@@ -56,8 +56,8 @@ import copy
 
 def make_hash(o):
     """
-    Makes a hash from a dictionary, list, tuple or set to any level, that contains
-    only other hashable types (including any lists, tuples, sets, and
+    Makes a hash from a dictionary, list, tuple or set to any level, that
+    contains only other hashable types (including any lists, tuples, sets, and
     dictionaries).
     """
 
@@ -377,18 +377,14 @@ class ChatReceived(Struct):
     message = StarString
 
 
-class WorldCoordinate(Struct):
+class WarpCommand(Struct):
+    warp_type = UBInt32
     sector = StarString
     x = SBInt32
     y = SBInt32
     z = SBInt32
     planet = SBInt32
     satellite = SBInt32
-
-
-class WarpCommand(Struct):
-    warp_type = UBInt32
-    coordinates = WorldCoordinate
     player = StarString
 
 
@@ -412,7 +408,8 @@ class GiveItem(Struct):
     name = StarString
     count = VLQ
     variant_type = Byte
-    description = StarString
+    extra = Byte
+    #description = StarString
 
 
 class ConnectResponse(Struct):
@@ -461,6 +458,3 @@ class BasePacket(Struct):
             obj['data'] = bytes(obj['data'].encode("utf-8"))
         res += obj['data']
         return res
-
-
-print(VLQ.build(123000))
