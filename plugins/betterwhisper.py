@@ -5,7 +5,8 @@
 #   Description: A better whisper plugin with reply and SocialSpy
 #===========================================================
 import asyncio
-from base_plugin import SimpleCommandPlugin, command
+from base_plugin import SimpleCommandPlugin
+from utilities import Command
 from plugins.player_manager import Admin, Guest, Owner
 
 __author__ = "FZFalzar"
@@ -22,7 +23,7 @@ class BetterWhisper(SimpleCommandPlugin):
         self.reply_history = dict()
         self.sspy_enabled_dict = dict()
 
-    @command("whisper", "w", role=Guest, doc="Sends a message to target player", syntax=("[name]", "[msg]"))
+    @Command("whisper", "w", role=Guest, doc="Sends a message to target player", syntax=("[name]", "[msg]"))
     def whisper(self, data, protocol):
         """Sends a message to target player. Syntax: /whisper [player name] [msg]"""
         if len(data) == 0:
@@ -35,7 +36,7 @@ class BetterWhisper(SimpleCommandPlugin):
         except:
             raise SyntaxWarning
 
-    @command("reply", "r", role=Guest, doc="Replies to last player who whispered you", syntax="[msg]")
+    @Command("reply", "r", role=Guest, doc="Replies to last player who whispered you", syntax="[msg]")
     def reply(self, data, protocol):
         """Replies to last player who whispered you. Syntax: /r [msg]"""
         if len(data) == 0:
@@ -85,7 +86,7 @@ class BetterWhisper(SimpleCommandPlugin):
                                                                      target_name,
                                                                      message))
 
-    @command("socialspy", role=Admin, doc="Enables the viewing of messages sent by other players")
+    @Command("socialspy", role=Admin, doc="Enables the viewing of messages sent by other players")
     def socialspy(self, data, protocol):
         try:
             if protocol.player.name in self.sspy_enabled_dict.keys():
